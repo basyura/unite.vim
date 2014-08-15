@@ -315,6 +315,10 @@ function! s:source.async_gather_candidates(args, context) "{{{
             \ }
     endif
 
+    if dict.action__line =~ '^matched binary file'
+      continue
+    endif
+
     if a:context.source__ssh_path != ''
       let dict.action__path =
             \ a:context.source__ssh_path . dict.action__path
