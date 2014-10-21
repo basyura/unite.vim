@@ -38,7 +38,7 @@ call unite#util#set_default('g:unite_source_grep_ignore_pattern',
       \'\~$\|\.\%(o\|exe\|dll\|bak\|sw[po]\)$\|'.
       \'\%(^\|/\)\.\%(hg\|git\|bzr\|svn\)\%($\|/\)\|'.
       \'\%(^\|/\)tags\%(-\a*\)\?$')
-call unite#util#set_default('g:unite_source_grep_encoding', 'char')
+call unite#util#set_default('g:unite_source_grep_encoding', 'utf-8')
 "}}}
 
 function! unite#sources#grep#define() "{{{
@@ -239,7 +239,7 @@ function! s:source.gather_candidates(args, context) "{{{
     let $TERM = 'dumb'
 
     let a:context.source__proc = vimproc#plineopen3(
-          \ vimproc#util#iconv(cmdline, &encoding, 'char'), 1)
+          \ vimproc#util#iconv(cmdline, &encoding, 'utf-8'), 1)
   finally
     let $TERM = save_term
   endtry
