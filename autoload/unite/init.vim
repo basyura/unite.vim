@@ -174,9 +174,11 @@ function! unite#init#_unite_buffer() "{{{
             \ call unite#handlers#_on_insert_leave()
       autocmd CursorHoldI <buffer>
             \ call unite#handlers#_on_cursor_hold_i()
+      " Keep buffer updates outside CursorMovedI's automatic undo save.
       autocmd CursorMovedI <buffer>
-            \ call unite#handlers#_on_cursor_moved_i()
-      autocmd CursorMoved,CursorMovedI <buffer>  nested
+            \ call feedkeys("\<Cmd>call unite#handlers#_on_cursor_moved_i()"
+            \ . "\<Bar>call unite#handlers#_on_cursor_moved()\<CR>", 'in')
+      autocmd CursorMoved <buffer> nested
             \ call unite#handlers#_on_cursor_moved()
       autocmd BufUnload,BufHidden <buffer>
             \ call unite#handlers#_on_buf_unload(expand('<afile>'))
