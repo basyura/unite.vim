@@ -166,26 +166,46 @@ function! unite#init#_unite_buffer() "{{{
     endif
 
     " Autocommands.
+    " Unite 用の自動コマンドグループを選択する。
     augroup plugin-unite
+      " 現在のバッファに登録済みの自動コマンドを削除する。
       autocmd! * <buffer>
+      " 現在のバッファで挿入モードに入ったときに実行する。
+      " 継続行：編集を許可し、挿入状態とプロンプトを更新する。
       autocmd InsertEnter <buffer>
             \ call unite#handlers#_on_insert_enter()
+      " 現在のバッファで挿入モードを終了したときに実行する。
+      " 継続行：入力内容を保存し、挿入状態と編集可否を更新する。
       autocmd InsertLeave <buffer>
             \ call unite#handlers#_on_insert_leave()
+      " 挿入モードで入力が一定時間止まったときに実行する。
+      " 継続行：ハイライトや候補の再描画を行い、非同期更新を継続する。
       autocmd CursorHoldI <buffer>
             \ call unite#handlers#_on_cursor_hold_i()
       " Keep buffer updates outside CursorMovedI's automatic undo save.
+      " 挿入モードでカーソルが移動したときに実行する。
+      " 継続行 1：自動的な Undo 保存の外で挿入モード用の更新処理を実行するキー列を予約する。
+      " 継続行 2：共通のカーソル移動処理も追加し、マッピングせず入力キューの先頭に入れる。
       autocmd CursorMovedI <buffer>
             \ call feedkeys("\<Cmd>call unite#handlers#_on_cursor_moved_i()"
             \ . "\<Bar>call unite#handlers#_on_cursor_moved()\<CR>", 'in')
+      " ノーマルモードなどでカーソルが移動したときに実行し、処理中の自動コマンドの入れ子を許可する。
+      " 継続行：カーソル位置に応じて編集可否、表示、プレビューなどを更新する。
       autocmd CursorMoved <buffer> nested
             \ call unite#handlers#_on_cursor_moved()
+      " バッファがアンロードされるか、ウィンドウに表示されなくなったときに実行する。
+      " 継続行：イベント対象のバッファ名を渡し、セッションの終了処理を行う。
       autocmd BufUnload,BufHidden <buffer>
             \ call unite#handlers#_on_buf_unload(expand('<afile>'))
+      " ウィンドウに入るか、バッファがウィンドウに表示されたときに実行する。
+      " 継続行：イベント対象のバッファ番号を渡し、更新間隔やウィンドウの状態を設定する。
       autocmd WinEnter,BufWinEnter <buffer>
             \ call unite#handlers#_on_bufwin_enter(bufnr(expand('<abuf>')))
+      " ウィンドウを離れるか、バッファがウィンドウから外れるときに実行する。
+      " 継続行：条件に応じて updatetime を保存済みの値に戻す。
       autocmd WinLeave,BufWinLeave <buffer>
             \ call unite#handlers#_restore_updatetime()
+    " 自動コマンドグループの選択を終了する。
     augroup END
 
     if v:version > 703 || v:version == 703 && has('patch418')
